@@ -29,12 +29,17 @@ public struct FlockMacro: MemberMacro, ExtensionMacro {
         conformingTo protocols: [TypeSyntax],
         in context: some MacroExpansionContext
     ) throws -> [DeclSyntax] {
-        guard let structDecl = declaration.as(StructDeclSyntax.self) else {
-            throw MacroError.message("@Flock can only be applied to structs")
+        let structDecl = declaration.as(StructDeclSyntax.self)
+        let classDecl = declaration.as(ClassDeclSyntax.self)
+
+        guard structDecl != nil || classDecl != nil else {
+            throw MacroError.message("@Flock can only be applied to structs or classes")
         }
+
         let namePropertyName = "name"
 
-        let existingNameProperty = structDecl.memberBlock.members.first { member in
+        let existingNameProperty = (structDecl?.memberBlock ?? classDecl!.memberBlock).members.first
+        { member in
             guard let varDecl = member.decl.as(VariableDeclSyntax.self) else {
                 return false
             }
@@ -49,10 +54,13 @@ public struct FlockMacro: MemberMacro, ExtensionMacro {
         var declarations: [DeclSyntax] = []
 
         if existingNameProperty == nil {
-            let structName = structDecl.name.text.trimmingCharacters(in: .whitespacesAndNewlines)
+            let structName = structDecl?.name.text.trimmingCharacters(in: .whitespacesAndNewlines)
+            let className = classDecl?.name.text.trimmingCharacters(in: .whitespacesAndNewlines)
+
+            let typeName = (structName ?? className)!
             let nameProperty = try VariableDeclSyntax(
                 """
-                public let \(raw: namePropertyName): String = "\(raw: structName)"
+                public let \(raw: namePropertyName): String = "\(raw: typeName)"
                 """
             )
             declarations.append(DeclSyntax(nameProperty))
