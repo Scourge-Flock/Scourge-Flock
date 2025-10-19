@@ -11,12 +11,20 @@ let package = Package(
             name: "ScourgeFlock",
             targets: ["ScourgeFlock"]
         ),
+        .library(
+            name: "ScourgeService",
+            targets: ["ScourgeService"]
+        ),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "ScourgeFlock"
+            name: "ScourgeFlock",
+            dependencies: ["ScourgeService"]
+        ),
+        .target(
+            name: "ScourgeService"
         ),
         .testTarget(
             name: "ScourgeFlockTests",
