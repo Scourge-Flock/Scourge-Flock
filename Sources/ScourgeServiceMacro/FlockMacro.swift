@@ -18,9 +18,7 @@ public struct FlockMacro: MemberMacro, ExtensionMacro {
         conformingTo protocols: [TypeSyntax],
         in context: some MacroExpansionContext
     ) throws -> [ExtensionDeclSyntax] {
-        let extensionDecl = try ExtensionDeclSyntax(
-            "extension \(type): ServiceDefinition {}"
-        )
+        let extensionDecl = try ExtensionDeclSyntax("extension \(type): ServiceDefinition") {}
 
         return [extensionDecl]
     }
